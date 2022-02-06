@@ -12,7 +12,7 @@ class Game():
 		self.game_mode = GAME_MODE
 		self.isPlaying = False
 		self.ai = 'O' if FIRST_PLAYER == 'X' else 'X'
-		self.scores = {'X': 0, 'O': 0}
+		self.scores = {'X': 10, 'O': 0}
 
 
 	def start(self):
@@ -88,31 +88,31 @@ class Game():
 
 
 	def change_turn(self):
-		if self.game_mode == '2P':
-			if self.board.isEmpty():
-				self.turn = 'O' if self.turn == 'X' else 'X'
-				self.ui.whose_turn.config(text=f'{self.turn} Turn')
+		if self.game_mode == '2P' and self.board.isEmpty():
+			self.turn = 'O' if self.turn == 'X' else 'X'
+			self.ui.whose_turn.config(text=f'{self.turn} Turn')
 		else:
 			if self.board.get_number_of_moves() == 1:
 				self.ai = self.turn
-				self.start()
-				# self.computer()
+				self.new_game()
 
 
 	def new_game(self):
 		if self.scores != {'X': 0, 'O': 0}: 
-			self.turn = FIRST_PLAYER
-			self.scores = {'X': 0, 'O': 0}
-			self.ui.xscore.config(text='X - 0')
-			self.ui.oscore.config(text='O - 0')
+			self.reset_scores()
 			self.start()
-			self.ui.alert('New Game has started!')
+			self.ui.alert('New Game Started!', 'bottom')
 
 
 	def change_game_mode(self):
+		if self.scores != {'X': 0, 'O': 0}: self.reset_scores()
+		if self.game_mode == '2P': 
+			self.ai = FIRST_PLAYER
+		else: 
+			self.turn = FIRST_PLAYER
 		self.game_mode = '2P' if self.game_mode == '1P' else '1P'
 		self.start()
-		self.ui.alert(f'Game mode: {self.game_mode}')
+		self.ui.alert(f'Game mode: {self.game_mode}', 'bottom')
 
 
 	def update_score(self):
@@ -132,6 +132,7 @@ class Game():
 
 
 	def mouse_motion(self, event):
+		
 		if self.isPlaying:
 			grid_cords = self.ui.pixel_to_grid((event.x, event.y))
 
@@ -139,6 +140,11 @@ class Game():
 			self.ui.canvas.config(cursor=cursor)
 
 
+	def reset_scores(self):
+		self.turn = FIRST_PLAYER
+		# self.scores = {'X': 0, 'O': 0}
+		# self.ui.xscore.config(text='X - 0')
+		# self.ui.oscore.config(text='O - 0')
 	
 
 

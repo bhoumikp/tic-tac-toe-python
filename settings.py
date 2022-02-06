@@ -1,5 +1,10 @@
 from os import path
 
+# Loading
+WAIT_TIME = 3000
+LOAD_DELAY = 500
+
+
 # UI
 BG = "#14bdac"
 WINDOW_SIZE = 370
@@ -14,6 +19,6 @@ GRID_COLOR = '#0da192'
 LOGO_PATH = path.join(path.dirname(__file__), 'logo.png')
 
 # Game 
-FIRST_PLAYER = 'X'
+FIRST_PLAYER = 'O'
 EMPTY = 0
 GAME_MODE = '2P'

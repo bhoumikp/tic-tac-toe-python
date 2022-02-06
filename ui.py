@@ -1,5 +1,6 @@
 from tkinter import *
 from settings import *
+from time import time
 
 
 class UI(Tk):
@@ -16,6 +17,7 @@ class UI(Tk):
 		self.canvas.grid(row=1, column=0, columnspan=3)
 
 		# Window Labels
+		self.resizable(False, False)
 		self.whose_turn = Label(bg='white', font=('Monospace', 10, 'bold'))
 		self.xscore = Label(bg='white', pady=5, font=('Monospace', 10))
 		self.oscore = Label(bg='white', font=('Monospace', 10))
@@ -32,6 +34,14 @@ class UI(Tk):
 		self.canvas.create_text(WINDOW_SIZE/2, WINDOW_SIZE/3, text='Tic Tac Toe', fill='black', font=('Roboto', int(-WINDOW_SIZE/12), 'bold'))
 		self.draw_XO('O', ((WINDOW_SIZE/2)+30, int(WINDOW_SIZE/2)), True, 2)
 		self.draw_XO('X', ((WINDOW_SIZE/2)-30, int(WINDOW_SIZE/2)), True, 2)
+		self.canvas.create_text(WINDOW_SIZE/2, WINDOW_SIZE/1.5, text='loading', fill=X_COLOR, font=('Monospace', int(-WINDOW_SIZE/20)), tag='loader')
+		def loader(dots, sec):
+			if sec > WAIT_TIME-500: return
+			if len(dots) > 2: dots = ''
+			dots+='.'
+			loader(dots, sec+LOAD_DELAY)
+			self.after(sec, lambda : self.canvas.itemconfig('loader', text=f'loading{dots}'))
+		loader('', 0)
 
 
 	def create_labels(self):
@@ -111,11 +121,15 @@ class UI(Tk):
 		self.players.unbind('<Button-1>')
 
 
-	def alert(self, text):
+	def alert(self, text, pos):
 		self.alert_msg = Label(text=text, bg='white', font=('Monospace', 10, 'bold'))
-		self.alert_msg.grid(row=0, column=0, columnspan=3)
+		if pos == 'top':
+			self.alert_msg.grid(row=0, column=0, columnspan=3)
+		elif pos == 'bottom': 
+			self.alert_msg.grid(row=2, column=0, columnspan=3)
 		self.whose_turn.unbind('Button-1')
 		self.after(1500, self.alert_msg.destroy)
+
 
 
 	
