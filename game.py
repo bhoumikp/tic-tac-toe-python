@@ -12,10 +12,12 @@ class Game():
 		self.game_mode = GAME_MODE
 		self.isPlaying = False
 		self.ai = 'O' if FIRST_PLAYER == 'X' else 'X'
-		self.scores = {'X': 10, 'O': 0}
+		self.scores = {'X': 0, 'O': 0}
 
 
+	# REMINDER: remove bind keys function
 	def start(self):
+		self.ui.geometry("370x430")
 		self.board.create_new_board()
 		self.ui.whose_turn.config(text=f'{self.turn} Turn', cursor='hand2')
 		self.ui.players.config(text=f'{self.game_mode}', cursor='hand2')
@@ -31,6 +33,7 @@ class Game():
 	def run(self, event):
 		if self.isPlaying:
 			self.ui.alert_msg.destroy()
+			self.ui.whose_turn.config(cursor='arrow')
 			grid_cords = self.ui.pixel_to_grid((event.x, event.y))
 			if grid_cords != None and self.board.isCellEmpty(grid_cords):
 				self.board.new_move(self.turn, grid_cords)
@@ -88,13 +91,14 @@ class Game():
 
 
 	def change_turn(self):
-		if self.game_mode == '2P' and self.board.isEmpty():
-			self.turn = 'O' if self.turn == 'X' else 'X'
-			self.ui.whose_turn.config(text=f'{self.turn} Turn')
+		if self.game_mode == '2P':
+			if self.board.isEmpty():
+				self.turn = 'O' if self.turn == 'X' else 'X'
+				self.ui.whose_turn.config(text=f'{self.turn} Turn')
 		else:
 			if self.board.get_number_of_moves() == 1:
 				self.ai = self.turn
-				self.new_game()
+				self.start()
 
 
 	def new_game(self):
@@ -122,8 +126,11 @@ class Game():
 
 
 	def bind_labels(self):
-		self.ui.whose_turn.bind('<Button-1>', lambda event : self.change_turn())
+		if self.scores == {'X': 0, 'O': 0}: self.ui.new_game.config(cursor='arrow')
+		else: self.ui.new_game.config(cursor='hand2')
 		self.ui.new_game.bind('<Button-1>', lambda event : self.new_game())
+		self.ui.bind('<t>', lambda event : self.change_turn())
+		self.ui.whose_turn.bind('<Button-1>', lambda event : self.change_turn())
 		self.ui.restart.bind('<Button-1>', lambda event : self.start())
 		self.ui.canvas.bind('<Button-1>', self.run)
 		self.ui.players.bind('<Button-1>', lambda event : self.change_game_mode())
@@ -131,8 +138,14 @@ class Game():
 		self.ui.canvas.config(cursor='hand2')
 
 
+	def bind_keys(self):
+		self.ui.bind('<t>', lambda event : self.change_turn())
+		self.ui.bind('<p>', lambda event : self.change_game_mode())
+		self.ui.bind('<r>', lambda event : self.start())
+		self.ui.bind('<n>', lambda event : self.new_game())
+
+
 	def mouse_motion(self, event):
-		
 		if self.isPlaying:
 			grid_cords = self.ui.pixel_to_grid((event.x, event.y))
 
@@ -142,9 +155,9 @@ class Game():
 
 	def reset_scores(self):
 		self.turn = FIRST_PLAYER
-		# self.scores = {'X': 0, 'O': 0}
-		# self.ui.xscore.config(text='X - 0')
-		# self.ui.oscore.config(text='O - 0')
+		self.scores = {'X': 0, 'O': 0}
+		self.ui.xscore.config(text='X - 0')
+		self.ui.oscore.config(text='O - 0')
 	
 
 
