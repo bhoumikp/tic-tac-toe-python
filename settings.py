@@ -4,8 +4,8 @@ from os import path
 WAIT_TIME = 3000
 LOAD_DELAY = 500
 
-
 # UI
+FONT_SIZE = 10
 BG = "#14bdac"
 CANVAS_SIZE = 370
 CELL_SIZE = CANVAS_SIZE / 3
@@ -17,8 +17,11 @@ GRID_LINE_WIDTH = 6
 DRAW_SCREEN_COLOR = 'light sea green'
 GRID_COLOR = '#0da192'
 LOGO_PATH = path.join(path.dirname(__file__), 'logo.png')
+GAME_MODES = ['Easy', 'Medium', 'Hard', '2P']
 
 # Game 
-FIRST_PLAYER = 'O'
+FIRST_PLAYER = 'X'
 EMPTY = 0
-GAME_MODE = '2P'
+GAME_MODE = 'Medium'
+ROWS = 3
+COLS = 3

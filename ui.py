@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import ttk
 from settings import *
 from time import time
 
@@ -20,13 +21,17 @@ class UI(Tk):
 
 		# Window Labels
 		self.resizable(False, False)
-		self.whose_turn = Label(bg='white', font=('Monospace', 10, 'bold'))
-		self.xscore = Label(bg='white', pady=5, font=('Monospace', 10))
-		self.oscore = Label(bg='white', font=('Monospace', 10))
-		self.new_game = Label(text='New Game', bg='white', cursor='hand2', font=('Monospace', 10, 'bold'))
-		self.restart = Label(text='Restart', bg='white', cursor='hand2', font=('Monospace', 10, 'bold'))
-		self.players = Label(bg='white', cursor='hand2', font=('Monospace', 10, 'bold'))
+		self.whose_turn = Label(bg='white', font=('Monospace', FONT_SIZE, 'bold'))
+		self.xscore = Label(bg='white', pady=5, font=('Monospace', FONT_SIZE))
+		self.oscore = Label(bg='white', font=('Monospace', FONT_SIZE))
+		self.new_game = Label(text='New Game', bg='white', cursor='hand2', font=('Monospace', FONT_SIZE, 'bold'))
+		self.restart = Label(text='Restart', bg='white', cursor='hand2', font=('Monospace', FONT_SIZE, 'bold'))
 		self.alert_msg = Label(text='', bg='white')
+
+		# OptionMenu
+		self.level = StringVar(self)
+		self.game_modes = None
+
 
 	
 	def loading_screen(self):
@@ -46,17 +51,18 @@ class UI(Tk):
 		loader('', 0)
 
 
-	def create_labels(self):
+	def create_widgets(self, game_mode, game_mode_func):
 		# Top row labels
 		self.xscore.grid(row=0, column=0)
 		self.whose_turn.grid(row=0, column=1)
 		self.oscore.grid(row=0, column=2)
 		
 		# Bottom row labels
-		self.players.grid(row=2, column=0, pady=5)
-		self.restart.grid(row=2, column=1)
+		self.game_modes = ttk.OptionMenu(self, self.level, game_mode, *GAME_MODES, direction='above', command=game_mode_func)
+		self.game_modes.grid(row=2, column=0)
+		self.restart.grid(row=2, column=1, pady=0)
 		self.restart.config(text='Restart')
-		self.new_game.grid(row=2, column=2, pady=5)
+		self.new_game.grid(row=2, column=2)
 		self.new_game.config(text='New Game')
 
 
@@ -64,6 +70,7 @@ class UI(Tk):
 		for n in range(1, 3):
 			self.canvas.create_line(CELL_SIZE*n, 0, CELL_SIZE*n, CANVAS_SIZE, width=GRID_LINE_WIDTH, fill=GRID_COLOR)
 			self.canvas.create_line(0, CELL_SIZE*n, CANVAS_SIZE, CELL_SIZE*n, width=GRID_LINE_WIDTH, fill=GRID_COLOR) 
+			d = ((CANVAS_SIZE/6)*1)
 
 
 	def draw_XO(self, symbol, grid_cords, anime: bool, ext=0):
@@ -92,35 +99,36 @@ class UI(Tk):
 
 
 	def gameover_anime(self, winner, play_again_func):
-		wintext = 'WINNER!' if winner != 'DRAW' else 'DRAW!'
+		wintext = 'WINNER!' if winner != 'draw' else 'DRAW!'
 		x = CANVAS_SIZE/2
 		y = CANVAS_SIZE/3
 
 		self.canvas.delete('all')
-		if winner == 'DRAW':
+		if winner == 'draw':
 			self.draw_XO('O', ((CANVAS_SIZE/2)+30,y), True, 2)
 			self.draw_XO('X', ((CANVAS_SIZE/2)-30,y), True, 2)
 		else:
 			self.draw_XO(winner, (x,y), True, 2)
 
+		self.whose_turn.config(text="Game Over", cursor='arrow')
 		self.canvas.create_text(int(CANVAS_SIZE/2), int(CANVAS_SIZE/1.8), text=wintext, fill=X_COLOR, font=('Ariel', int(-CANVAS_SIZE/7), 'bold'))
+		self.game_modes.destroy()
 		self.new_game.config(text='', cursor='arrow')
-		self.players.config(text='', cursor='arrow')
 		self.restart.config(text='Play Again')
+		self.restart.grid(pady=5)
 		self.restart.bind('<Button-1>', play_again_func)
 
 
 	def gameover(self, winner, play_again_func):
-		self.unbind_labels()
-		self.whose_turn.config(text='Game Over', cursor='arrow')
-		self.after(500, self.gameover_anime, winner, play_again_func)
+		self.unbind_widgets()
+		self.after(1000, self.gameover_anime, winner, play_again_func)
 
 
-	def unbind_labels(self):
+	def unbind_widgets(self):
 		self.canvas.config(cursor='arrow')
 		self.canvas.unbind('<Button-1>')
 		self.new_game.unbind('<Button-1>')
-		self.players.unbind('<Button-1>')
+		self.restart.unbind('<Button-1>')
 
 
 	def alert(self, text, pos):
